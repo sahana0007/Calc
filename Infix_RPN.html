@@ -1,0 +1,130 @@
+<HTML>
+<FORM name="mycalculator">
+    <input name="mydisp" type="Text" size=10 value="0" > <br>
+    <input type="Button" value="7" onclick="digitKey(7)">
+    <input type="Button" value="8" onclick="digitKey(8)">
+    <input type="Button" value="9" onclick="digitKey(9)">
+    <input type="Button" value="X" onclick="oprKey('X')"> <br>
+    <input type="Button" value="4" onclick="digitKey(4)">
+    <input type="Button" value="5" onclick="digitKey(5)">
+    <input type="Button" value="6" onclick="digitKey(6)">
+    <input type="Button" value="/" onclick="oprKey('/')"> <br>
+    <input type="Button" value="1" onclick="digitKey(1)">
+    <input type="Button" value="2" onclick="digitKey(2)">
+    <input type="Button" value="3" onclick="digitKey(3)">
+    <input type="Button" value="-" onclick="oprKey('-')"> <br>
+    <input type="Button" value="0" onclick="digitKey(0)">
+    <input type="Button" value="." onclick="appendDecimal()">
+    <input type="Button" value="=" onclick="oprKey('=')">
+    <input type="Button" value="+" onclick="oprKey('+')"><br>
+    <input type="Button" style="width:44px" value="Press" onclick="ButtonPress()">
+    <input type="Button" class="htninput" value="RPN" onclick = "CalcInfixRPN('RPN')">
+    <input type="Button" autofocus class="htninput" value="Infix" onclick = "CalcInfixRPN('Infix')">
+    
+</FORM>
+<script> 
+function display(a) { document.forms['mycalculator']['mydisp'].value=a; }
+var isSelectDecimal = false;
+var opr = ' ', num = 0, selectedMode = 'Infix', answer = ' ' ;
+var count = 1;
+var stack=[];
+
+function apply (a,op,n) {
+  switch (op) {
+      case "+": return a += n; 
+      case "-": return a -= n;
+      case "X": return a *= n;
+      case "/": return a /= n;
+    } 
+}
+
+function CalcInfixRPN(selectInfixOrRPN)
+{
+    selectedMode = selectInfixOrRPN;
+    num = 0;  //displays 0 on selection
+    display(num);
+}
+
+function digitKey (key) {
+    if(isSelectDecimal)
+    {
+        num = num + key/count;
+        count= count * 10
+    }
+    else if(num != 0) //any digit other than 0
+    {
+        num = num*10 + key
+        count = 1
+    }
+    else
+     num = key; 
+     display(num);
+  }
+
+
+function ButtonPress(){
+    stack.push(num);
+    display(num);
+    num = 0; //reset
+    count = 1;
+    isSelectDecimal = false;
+}
+
+
+function appendDecimal(){
+    isSelectDecimal = true;
+    count = 10;
+    display(num +'.'); //appends decimal value with num and displays in the screen
+}
+
+function oprKey(key){
+    if (selectedMode == 'Infix')
+    {
+        if(opr == ' ' ) answer = num;
+        else answer = apply(answer,opr,num);
+        if (key =='=')
+        {
+            opr = ' ';
+            num = answer;
+        }
+        else 
+        {
+            opr = key;
+            num = 0;  //reset to 0
+        }
+        display(answer);
+        isSelectDecimal = false;
+        count = 1;
+    }
+    else   
+    {
+        stack.push(num);  //insert num
+        answer = apply(stack[stack.length-1], key, stack[stack.length-2])  //places in stack
+        stack.pop();
+        stack.pop();
+        num = answer;
+        display(answer);
+//      if(stack.length != 1) throw "Extra operand";
+//   return stack[0];
+    }
+}
+</script>
+ 
+
+   <style>
+    input {
+      height: 30px;
+      width: 29px;
+      padding: 5px 5px 5px 5px;
+     }
+     input[type=text] {
+       height: 15px; width: 130px; }
+     form { 
+       width: 135px;
+       border: solid #387a01 10px; }
+       .htninput {width: 40px}
+       .htninput:focus {
+           background: rgb(241, 245, 16);
+       }
+   </style>
+</HTML>
